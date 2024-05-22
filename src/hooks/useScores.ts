@@ -10,23 +10,25 @@ interface Streamer {
 
 const useScores = (initialData: Streamer[]) => {
   const [data, setData] = useState<Streamer[]>(initialData);
+  const [previousData, setPreviousData] = useState<Streamer[]>(initialData);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setData((prevData) =>
-        prevData
-          .map((streamer) => ({
+      setPreviousData(data);
+      setData((prevData: Streamer[]) =>
+        [...prevData]
+          .map((streamer: Streamer) => ({
             ...streamer,
-            score: streamer.score + Math.floor(Math.random() * 1000),
+            // Random if this streamer will gain points or not
+            score: streamer.score + (Math.random() > 0.5 ? Math.floor(Math.random() * 3000) : 0),
           }))
-          .sort((a, b) => b.score - a.score)
+          .sort((a: Streamer, b: Streamer) => b.score - a.score)
       );
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [data]);
 
-  return data;
+  return { data, previousData };
 };
-
 export default useScores;
